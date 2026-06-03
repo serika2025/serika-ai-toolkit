@@ -1,0 +1,52 @@
+name: Build SERIKA AI 简易工具箱
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate icon.ico from tb.jpg
+        run: |
+          python -c "from PIL import Image; img=Image.open('tb.jpg'); img.save('icon.ico',format='ICO',sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)]); print('icon.ico generated')"
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller SERIKA_AI.spec --noconfirm --log-level INFO
+
+      - name: Verify build output
+        run: |
+          if (Test-Path "dist\SERIKA AI简易工具箱\SERIKA_AI.exe") {
+            Write-Host "EXE found: $((Get-Item 'dist\SERIKA AI简易工具箱\SERIKA_AI.exe').Length) bytes"
+          } else {
+            Write-Error "Build failed: EXE not found"
+            exit 1
+          }
+          $pyCount = (Get-ChildItem "dist\SERIKA AI简易工具箱" -Recurse -Filter *.py).Count
+          Write-Host ".py files in output: $pyCount"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SERIKA-AI-toolkit
+          path: dist\SERIKA AI简易工具箱\
+          retention-days: 30
