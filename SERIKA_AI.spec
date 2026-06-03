@@ -15,11 +15,7 @@ root = Path(SPECPATH)
 a = Analysis(
     ['main.py'],
     pathex=[str(root)],
-    binaries=[
-        # Include ffmpeg binaries for audio conversion
-        (str(root / 'ffmpeg_bin' / 'ffmpeg.exe'), 'ffmpeg_bin'),
-        (str(root / 'ffmpeg_bin' / 'ffprobe.exe'), 'ffmpeg_bin'),
-    ],
+    binaries=[],
     datas=[
         (str(root / 'icon.ico'), '.'),
     ],
