@@ -33,6 +33,12 @@ jobs:
         run: |
           pyinstaller SERIKA_AI.spec --noconfirm --log-level INFO
 
+      - name: Upload Release Asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: SERIKA_AI_Executable  # 下载时的压缩包名称（可自定义）
+          path: dist/                 # 编译出来的文件所在的文件夹路径（根据你的实际打包输出修改）
+
       - name: Verify build output
         run: |
           if (Test-Path "dist\SERIKA AI简易工具箱\SERIKA_AI.exe") {
@@ -50,3 +56,11 @@ jobs:
           name: SERIKA-AI-toolkit
           path: dist\SERIKA AI简易工具箱\
           retention-days: 30
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') # 仅在打标签(Tag)推送时触发发布
+        with:
+          files: |
+            dist/*.exe
+            dist/*.zip
