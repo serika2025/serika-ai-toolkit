@@ -31,6 +31,7 @@ DEFAULT_CONFIG = {
     "audio": {
         "languages": "",
         "regions": "",
+        "auto_line_break": False,
         "active_model_id": ""
     },
     "expand": {
