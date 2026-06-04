@@ -31,11 +31,12 @@ class AudioWorker(QThread):
     usage_updated = pyqtSignal(int, int, int)
     ffmpeg_missing = pyqtSignal()
 
-    def __init__(self, audio_path, languages="", regions=""):
+    def __init__(self, audio_path, languages="", regions="", auto_line_break=False):
         super().__init__()
         self.audio_path = os.path.abspath(audio_path)
         self.languages = languages
         self.regions = regions
+        self.auto_line_break = auto_line_break
         self.config = ConfigManager()
 
     def run(self):
@@ -60,7 +61,7 @@ class AudioWorker(QThread):
             self.status_changed.emit("连接中...")
             self.progress_changed.emit(28)
 
-            pt = get_audio_prompt(self.languages, self.regions)
+            pt = get_audio_prompt(self.languages, self.regions, self.auto_line_break)
 
             if fmt == "Gemini":
                 r = self._gemini(eu, ak, mn, mp3, pt)
