@@ -37,17 +37,20 @@ def get_translation_prompt(source_lang, target_lang, keep_abbr, auto_correct, ke
     return system_prompt
 
 
-def get_audio_prompt(languages="", regions=""):
+def get_audio_prompt(languages="", regions="", auto_line_break=False):
     """
     Build a prompt for the Whisper transcription API.
     languages: comma-separated string of possible languages
     regions: comma-separated string of countries/regions for dialect context
+    auto_line_break: whether to ask the model to insert line breaks
     """
     parts = []
     if languages.strip():
         parts.append(f"这段音频可能包含以下语言：{languages.strip()}")
     if regions.strip():
         parts.append(f"音频说话者可能来自以下国家或地区：{regions.strip()}，请据此匹配对应的方言和语言习惯")
+    if auto_line_break:
+        parts.append("请根据语义和停顿自动插入换行，使文本便于阅读")
     if parts:
         parts.append("请准确识别并按原文逐字转写，即使原文包含多种语言（如中文夹杂西班牙语），也必须原样输出每一个字词，绝对不允许翻译或意译")
         return "；".join(parts) + "。"
