@@ -1,7 +1,7 @@
 import os
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QTextEdit, QPushButton, QProgressBar, QGroupBox,
-                             QLineEdit, QFileDialog, QApplication, QMessageBox, QComboBox)
+                             QLineEdit, QFileDialog, QApplication, QMessageBox, QComboBox, QCheckBox)
 from PyQt6.QtCore import Qt, QEvent
 from config.config_manager import ConfigManager
 from config.model_manager import ModelManager
@@ -65,6 +65,11 @@ class AudioTab(QWidget):
         hint_layout.addLayout(lang_section)
         hint_layout.addLayout(region_section)
         settings_layout.addLayout(hint_layout)
+
+        # Auto line break
+        self.auto_wrap_cb = QCheckBox("自动换行")
+        self.auto_wrap_cb.setToolTip("#开启后，模型会根据音频自动进行换行，便于阅读，但有些情况下他可能不应该开启")
+        settings_layout.addWidget(self.auto_wrap_cb)
 
         # File upload area (supports drag-drop)
         file_layout = QHBoxLayout()
@@ -158,6 +163,7 @@ class AudioTab(QWidget):
         audio_cfg = self.config.get_section("audio")
         self.lang_input.setText(audio_cfg.get("languages", ""))
         self.region_input.setText(audio_cfg.get("regions", ""))
+        self.auto_wrap_cb.setChecked(audio_cfg.get("auto_line_break", False))
 
         self.refresh_model_list()
         aid = audio_cfg.get("active_model_id", "")
@@ -231,7 +237,8 @@ class AudioTab(QWidget):
         self.worker = AudioWorker(
             audio_path=self.audio_path,
             languages=self.lang_input.text().strip(),
-            regions=self.region_input.text().strip()
+            regions=self.region_input.text().strip(),
+            auto_line_break=self.auto_wrap_cb.isChecked()
         )
         self.worker.status_changed.connect(self.update_status)
         self.worker.progress_changed.connect(self.update_progress)
